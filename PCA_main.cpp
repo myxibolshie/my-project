@@ -39,7 +39,7 @@ int main() {
 //    data_T_standardization.print();
     Matrix cov_data = data_T_standardization.covariation();
 //    cov_data.print();
-    pair<Matrix, Matrix> EIG = cov_data.rotation_method(64);
+    pair<Matrix, Matrix> EIG = cov_data.rotation_method(cov_data.size());
     Matrix eigenvalues = EIG.first;
     Matrix eigenvectors = EIG.second;
   //  eigenvalues.print();
