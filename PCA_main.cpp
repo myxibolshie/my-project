@@ -58,8 +58,8 @@ int main() {
     	writeMatrixToCSV(name, final_matrix_tr, "output1.csv");
         }
     else {
-	Mat image = imread("2.jpg",IMREAD_GRAYSCALE);
-	const int blockSize = 8;
+	Mat image = imread("chisto (1).jpg",IMREAD_GRAYSCALE);
+	const int blockSize = 16;
 	const int k = 64;
 
 	Mat imageDouble;
@@ -80,9 +80,10 @@ int main() {
 	pair<Matrix, Matrix> EIG = blocks_cov.rotation_method(blocks_cov.size());
 	Matrix eigenvalues = EIG.first;
 	Matrix eigenvectors = EIG.second;
-	eigenvalues.print();
-	Matrix Y = blocks_cnt * eigenvectors;
-        Matrix X_final = Y * eigenvectors.transposed();	
+	Matrix eigenvectors_new = eigenvectors.leftCols(k);
+//	eigenvalues.print();
+	Matrix Y = blocks_cnt * eigenvectors_new;
+        Matrix X_final = Y * eigenvectors_new.transposed();	
 	X_final = X_final.center(X_final,1);
 	
 
@@ -92,7 +93,7 @@ int main() {
 	Mat construktImage = blocksToImage(X_final, image.rows, image.cols, blockSize);
 	normalize(construktImage,construktImage,0,255,NORM_MINMAX);
 	construktImage.convertTo(construktImage,CV_8U);
-	imwrite("reconstruct_image_1.jpg",construktImage);
+	imwrite("reconstruct_image_2.jpg",construktImage);
 	cout << "The method is done!" << endl;
 
 	

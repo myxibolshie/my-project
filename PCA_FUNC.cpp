@@ -46,6 +46,8 @@ Matrix Matrix::transposed()  {
 		return  transposed;
 }
 
+
+
 Matrix Matrix::operator*(const Matrix &other ) {
 		Matrix new_vec(row, other.cols());
 		for(size_t i = 0; i < row; i++) {
@@ -66,7 +68,7 @@ pair<Matrix, Matrix>  Matrix::rotation_method(int param) {
 		}
 		Matrix vec = *this;
 
-		double epsilon = 0.001;
+		double epsilon = 0.1;
 		while(true) {
 			auto max_index = find_max(vec);
 			int i = max_index[0];
@@ -426,7 +428,20 @@ Mat blocksToImage(Matrix& blocks, int rows, int cols, int blockSize) {
     return image;
 }
 
+Matrix Matrix::leftCols(int k) const { 
+    
 
+    Matrix result(size(), k); 
+
+    
+    for (int i = 0; i < size(); ++i) {
+        for (int j = 0; j < k; ++j) {
+            result.matrix[i][j] = (*this).matrix[i][j]; 
+        }
+    }
+
+    return result;
+}
 
 
 

@@ -39,6 +39,7 @@ struct Matrix {
 	Matrix& operator=(const Matrix& _matrixp);
 	void print();
 	Matrix center(Matrix& Mat, int a);
+	Matrix leftCols(int k) const;
 
 	
 };
