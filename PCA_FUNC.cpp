@@ -46,6 +46,8 @@ Matrix Matrix::transposed()  {
 		return  transposed;
 }
 
+
+
 Matrix Matrix::operator*(const Matrix &other ) {
 		Matrix new_vec(row, other.cols());
 		for(size_t i = 0; i < row; i++) {
@@ -66,7 +68,7 @@ pair<Matrix, Matrix>  Matrix::rotation_method(int param) {
 		}
 		Matrix vec = *this;
 
-		double epsilon = 0.001;
+		double epsilon = 0.1;
 		while(true) {
 			auto max_index = find_max(vec);
 			int i = max_index[0];
@@ -165,6 +167,25 @@ double Matrix::average( vector<double>& vec ) {
 		}
 		average = average / i;
         	return average;
+}
+
+
+Matrix Matrix::center(Matrix& Mat, int a = 0){
+	Matrix Mat_Tr = Mat.transposed();
+	
+	for(int i = 0; i < Mat_Tr.size(); i++){
+		double num = average(Mat_Tr.matrix[i]);
+		for(int j = 0; j < Mat_Tr.cols(); j++){
+			if (a==0){
+				Mat_Tr.matrix[i][j] -= num;
+			}
+			else{
+				Mat_Tr.matrix[i][j] += num;
+} 
+		}
+	}
+	Matrix Mat_Tr_Tr = Mat_Tr.transposed();
+	return Mat_Tr_Tr;
 }
 
 double Matrix::standart_deviation( vector<double>& vec) {
@@ -328,8 +349,11 @@ void main_components(Matrix& main_matrix, Matrix& eig_values, vector<string>& na
             if (s > 0 && s <= static_cast<int>(main_matrix.matrix.size())) {
                 main_matrix.matrix.erase(main_matrix.matrix.begin() + (s - 1));
 		main_matrix.row -= 1;
+		if (names.size() != 0){
                 names.erase(names.begin() + (s - 1));
-            } else {
+		}
+            } 
+	    else {
                 cout << "Invalid component number. Please enter a valid number." << endl;
             }
 
@@ -342,10 +366,82 @@ void main_components(Matrix& main_matrix, Matrix& eig_values, vector<string>& na
 }
 
 
+Matrix imageToBlocks(Mat& image, int BlockSize){
+	vector<vector<double>>  blocks;
+	for (size_t i=0; i < image.rows; i += BlockSize){
+		for (size_t j=0; j < image.cols; j += BlockSize){
+			Mat block = image(Rect(j, i, BlockSize, BlockSize)).clone();
+			vector<double> v = blockToVector(block);
+			blocks.push_back(v);
+			
 
 
 
+		}
+	}
+	Matrix blocksMatrix(blocks);
+	return blocksMatrix;
 
+
+}
+
+vector<double>  blockToVector(Mat& block){
+	vector<double> v;
+	
+	if (block.empty() || block.type() != CV_64F){
+		cout << "block is empty or type is not CV_64F"<<endl;
+		return v;
+	}
+	
+	
+	for (int i = 0;i < block.rows; i += 1){
+		for (int j = 0; j < block.cols; j +=1){
+			v.push_back(block.at<double>(i,j));
+
+		}
+	}
+	return v;
+}
+
+
+
+Mat blocksToImage(Matrix& blocks, int rows, int cols, int blockSize) {
+    Mat image(rows, cols, CV_64F, Scalar(0));
+    int index = 0;
+    for (int i = 0; i < rows; i += blockSize) {
+        for (int j = 0; j < cols; j += blockSize) {
+            int actualHeight = min(blockSize, rows - i);
+            int actualWidth = min(blockSize, cols - j);
+            
+            
+            if (blocks.matrix[index].size() != blockSize*blockSize) {
+                cerr << "Ошибка размера блока!" << endl;
+                exit(1);
+            }
+            
+            Mat fullBlock(blockSize, blockSize, CV_64F, const_cast<double*>(blocks.matrix[index].data()));
+            Mat targetROI = image(Rect(j, i, actualWidth, actualHeight));
+            fullBlock(Rect(0, 0, actualWidth, actualHeight)).copyTo(targetROI);
+            index++;
+        }
+    }
+    return image;
+}
+
+Matrix Matrix::leftCols(int k) const { 
+    
+
+    Matrix result(size(), k); 
+
+    
+    for (int i = 0; i < size(); ++i) {
+        for (int j = 0; j < k; ++j) {
+            result.matrix[i][j] = (*this).matrix[i][j]; 
+        }
+    }
+
+    return result;
+}
 
 
 
