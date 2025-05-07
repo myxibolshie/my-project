@@ -50,7 +50,7 @@ int main() {
 	   
     Mat image = imread("image.jpg", IMREAD_GRAYSCALE);
     if (image.empty()) {
-        cerr << "Ошибка загрузки изображения!" << endl;
+        cerr << "sdОшибка загрузки изображения!" << endl;
         return 1;
     }
     
