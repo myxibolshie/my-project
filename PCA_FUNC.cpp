@@ -8,19 +8,19 @@
 
 
 
-Matrix::Matrix(size_t rows, size_t cols) {
+MyMatrix::MyMatrix(int rows, int cols) {
 		row = rows;
 		col = cols;
 		matrix.resize(rows, vector<double>(cols, 0.0));
 }
 
-Matrix::Matrix(const vector<vector<double>>& data) {
+MyMatrix::MyMatrix(const vector<vector<double>>& data) {
 		matrix = data;
 		row = matrix.size();
 		col = matrix[0].size();
 }
 
-Matrix::Matrix(initializer_list<initializer_list<double>> init) {
+MyMatrix::MyMatrix(initializer_list<initializer_list<double>> init) {
         	for (auto row : init) {
             		matrix.push_back(vector<double>(row));
         	}
@@ -28,16 +28,16 @@ Matrix::Matrix(initializer_list<initializer_list<double>> init) {
 		col = matrix[0].size();
 }
 
-size_t Matrix::size() const {
+int MyMatrix::size() const {
         	return matrix.size();
 }
 
-size_t Matrix::cols() const {
+int MyMatrix::cols() const {
         	return matrix[0].size();
 }
 
-Matrix Matrix::transposed()  {
-	        Matrix transposed(col, row);
+MyMatrix MyMatrix::transposed()  {
+	        MyMatrix transposed(col, row);
 		for (int i = 0; i < row; i++) {
 		           for(int j = 0; j < col; j++) {
 				   transposed.matrix[j][i] = matrix[i][j];
@@ -48,8 +48,8 @@ Matrix Matrix::transposed()  {
 
 
 
-Matrix Matrix::operator*(const Matrix &other ) {
-		Matrix new_vec(row, other.cols());
+MyMatrix MyMatrix::operator*(const MyMatrix &other ) {
+		MyMatrix new_vec(row, other.cols());
 		for(size_t i = 0; i < row; i++) {
 			for(size_t j = 0; j < other.cols(); j++) {
 				new_vec.matrix[i][j] = 0;
@@ -61,14 +61,24 @@ Matrix Matrix::operator*(const Matrix &other ) {
 		return new_vec;
 }
 
-pair<Matrix, Matrix>  Matrix::rotation_method(int param) {
-		Matrix eig_vectors(param, param);
+MyMatrix MyMatrix::operator/(const int  n) {
+	MyMatrix new_vec(row, col);
+	for(size_t i = 0; i < row; i) {
+		for(size_t j = 0; j < col; j++) {
+			new_vec.matrix[i][j] = matrix[i][j] / n;
+		}
+	}
+	return new_vec;
+}
+
+pair<MyMatrix, MyMatrix>  MyMatrix::rotation_method(int param) {
+		MyMatrix eig_vectors(param, param);
 		for (size_t i = 0; i < param; i++) {
 			eig_vectors.matrix[i][i] = 1;
 		}
-		Matrix vec = *this;
+		MyMatrix vec = *this;
 
-		double epsilon = 0.1;
+		double epsilon = 0.001;
 		while(true) {
 			auto max_index = find_max(vec);
 			int i = max_index[0];
@@ -76,7 +86,7 @@ pair<Matrix, Matrix>  Matrix::rotation_method(int param) {
 
 
 	        	if (abs(vec.matrix[i][j]) < epsilon) break;
-	        	Matrix R(vec.size(), vec.size());
+	        	MyMatrix R(vec.size(), vec.size());
 	        	for (size_t k = 0; k < vec.size(); k++) {
 			 	R.matrix[k][k] = 1;
 			}
@@ -86,8 +96,8 @@ pair<Matrix, Matrix>  Matrix::rotation_method(int param) {
 			R.matrix[j][j] = c;
 			R.matrix[i][j] = -s;
 			R.matrix[j][i] = s;
-			Matrix R_tr = R.transposed();
-			Matrix C = R_tr * vec;
+			MyMatrix R_tr = R.transposed();
+			MyMatrix C = R_tr * vec;
 			vec =  C * R;
 			eig_vectors = eig_vectors * R;
 
@@ -95,7 +105,7 @@ pair<Matrix, Matrix>  Matrix::rotation_method(int param) {
 		return {vec, eig_vectors };
 }
 
-double Matrix::find_angle(Matrix &data, int i, int j) {
+double MyMatrix::find_angle(MyMatrix &data, int i, int j) {
 		double angle;
         	if (data.matrix[i][i] == data.matrix[j][j]) {
 			angle = M_PI / 4;
@@ -106,7 +116,7 @@ double Matrix::find_angle(Matrix &data, int i, int j) {
 		return angle;
 }
 
-vector<double> Matrix::find_max( Matrix& vec) {
+vector<double> MyMatrix::find_max( MyMatrix& vec) {
 		double max = -10;
 		double i_max;
 		double j_max;
@@ -123,8 +133,8 @@ vector<double> Matrix::find_max( Matrix& vec) {
 		return v;
 }
 
-Matrix Matrix::covariation() {
-		Matrix new_vec(row, row);
+MyMatrix MyMatrix::covariation() {
+		MyMatrix new_vec(row, row);
 		vector<double> average_value;
 		for(size_t i = 0; i < row; i++) {
 			average_value.push_back(average(matrix[i]));
@@ -141,9 +151,8 @@ Matrix Matrix::covariation() {
 		}
 		return new_vec;
 }
-
-Matrix Matrix::standardization() {
-		Matrix new_vec(row, col);
+MyMatrix MyMatrix::standardization() {
+		MyMatrix new_vec(row, col);
 		for(size_t i = 0; i < row; i++){
 			for(size_t j = 0; j < col; j++) {
 				if (abs(matrix[i][j] -  average(matrix[i])) < 1e-10) {
@@ -158,7 +167,7 @@ Matrix Matrix::standardization() {
 }
 
 
-double Matrix::average( vector<double>& vec ) {
+double MyMatrix::average( vector<double>& vec ) {
 		double average = 0;
 		double i = 0;
 		for (auto vec_element: vec) {
@@ -170,25 +179,8 @@ double Matrix::average( vector<double>& vec ) {
 }
 
 
-Matrix Matrix::center(Matrix& Mat, int a = 0){
-	Matrix Mat_Tr = Mat.transposed();
-	
-	for(int i = 0; i < Mat_Tr.size(); i++){
-		double num = average(Mat_Tr.matrix[i]);
-		for(int j = 0; j < Mat_Tr.cols(); j++){
-			if (a==0){
-				Mat_Tr.matrix[i][j] -= num;
-			}
-			else{
-				Mat_Tr.matrix[i][j] += num;
-} 
-		}
-	}
-	Matrix Mat_Tr_Tr = Mat_Tr.transposed();
-	return Mat_Tr_Tr;
-}
 
-double Matrix::standart_deviation( vector<double>& vec) {
+double MyMatrix::standart_deviation( vector<double>& vec) {
 		double star_dev = 0;
 		double averag = average(vec);
 		double size = vec.size();
@@ -203,7 +195,7 @@ double Matrix::standart_deviation( vector<double>& vec) {
 		return star_dev;
 }
 
-Matrix& Matrix::operator=(const Matrix& _matrixp) {
+MyMatrix& MyMatrix::operator=(const MyMatrix& _matrixp) {
 	    if (this != &_matrixp) {
 		    for (int i = 0; i < _matrixp.size(); i++) {
 			    for (int j = 0; j < _matrixp.cols(); j++) {
@@ -215,7 +207,7 @@ Matrix& Matrix::operator=(const Matrix& _matrixp) {
 	return *this;
 }
 
-void Matrix::print() {
+void MyMatrix::print() {
 		for(size_t i = 0; i < matrix.size(); i++) {
 			for(size_t j = 0; j < matrix[0].size(); j ++) {
 				cout << matrix[i][j] << " ";
@@ -224,7 +216,7 @@ void Matrix::print() {
 		}
 }
 
-pair<vector<string>, Matrix>  writeMatrixFromCSV(const string& filename,const int row,const int col) {
+pair<vector<string>, MyMatrix>  writeMatrixFromCSV(const string& filename,const int row,const int col) {
 		ifstream file(filename);
 		string line;
 		if (!file.is_open()) {
@@ -240,28 +232,19 @@ pair<vector<string>, Matrix>  writeMatrixFromCSV(const string& filename,const in
 		}
 
 		int v = 0;
-		Matrix data(row, col);
+		MyMatrix data(row, col);
 		for (size_t i = 0; i < row; i++) {
 			for (size_t j = 0; j < col; j++) {
 				string line;
 				cout << line << endl;
-			//	cout << typeid(line).name() << endl;
 				getline(file,line,',');
-			//	cout << typeid(line).name() << endl;
-			//	cout << typeid(stod(line)).name() << endl;
-			//	cout << line << endl;
-			//	try {
 				data.matrix[i][j] = stod(line);
-			//	} catch ( const invalid_argument& e ) {
-			//		v += 1;
-			//		cout << "Error value " << v <<" " <<  line<<  endl;
-			//	}
 			}
 		}
 		return {names, data};
 }
 
-void writeMatrixToCSV(const  vector<string>& names ,const Matrix& vec, const string& filename) {
+void writeMatrixToCSV(const  vector<string>& names ,const MyMatrix& vec, const string& filename) {
 		ofstream file(filename);
 		if (!file.is_open()) {
         		cerr << "Ошибка открытия файла!" << endl;
@@ -294,9 +277,9 @@ void hello_world() {
 	cout << "The introduction was created for the correct use of the program" << endl;
 	cout << "The csv file type that is needed for the program to work correctly will now be shown." << endl;
 	cout << endl;
-	Matrix  S = {{1,2,3,4,45,45,89,12} ,{23,45,67,89,54,23,89,43}, {45,56,67,78,12,18,65,87}};
+	MyMatrix  S = {{1,2,3,4,45,45,89,12} ,{23,45,67,89,54,23,89,43}, {45,56,67,78,12,18,65,87}};
 	vector<string> s = {"Length", "Width", "Height"};
-	Matrix S_tr = S.transposed();
+	MyMatrix S_tr = S.transposed();
 	for(auto el: s){
 		cout << el << ",";
 	}
@@ -314,11 +297,11 @@ void hello_world() {
 }
 
 
-void main_components(Matrix& main_matrix, Matrix& eig_values, vector<string>& names) {
+void main_components(MyMatrix& main_matrix, MyMatrix& eig_values, vector<string>& names) {
     double sum = 0;
     vector<double> eig_value;
 
-    // Суммируем собственные значения и сохраняем их в вектор
+    
     for(size_t i = 0; i < eig_values.size(); i++) {
         sum += eig_values.matrix[i][i];
         eig_value.push_back(eig_values.matrix[i][i]);
@@ -366,46 +349,31 @@ void main_components(Matrix& main_matrix, Matrix& eig_values, vector<string>& na
 }
 
 
-Matrix imageToBlocks(Mat& image, int BlockSize){
-	vector<vector<double>>  blocks;
-	for (size_t i=0; i < image.rows; i += BlockSize){
-		for (size_t j=0; j < image.cols; j += BlockSize){
-			Mat block = image(Rect(j, i, BlockSize, BlockSize)).clone();
-			vector<double> v = blockToVector(block);
-			blocks.push_back(v);
-			
 
-
-
-		}
-	}
-	Matrix blocksMatrix(blocks);
-	return blocksMatrix;
-
-
+vector<VectorXd> imageToBlocks(const Mat& image, int blockSize) {
+    vector<VectorXd> blocks;
+    for (int i = 0; i < image.rows; i += blockSize) {
+        for (int j = 0; j < image.cols; j += blockSize) {
+            // Рассчитываем актуальные размеры блока
+            int actualHeight = min(blockSize, image.rows - i);
+            int actualWidth = min(blockSize, image.cols - j);
+            
+            Mat block = image(Rect(j, i, actualWidth, actualHeight)).clone();
+            
+                        if (actualHeight < blockSize || actualWidth < blockSize) {
+                Mat paddedBlock = Mat::zeros(blockSize, blockSize, CV_64F);
+                block.copyTo(paddedBlock(Rect(0, 0, actualWidth, actualHeight)));
+                block = paddedBlock;
+            }
+            
+            VectorXd vec(Map<VectorXd>(block.ptr<double>(), blockSize * blockSize));
+            blocks.push_back(vec);
+        }
+    }
+    return blocks;
 }
 
-vector<double>  blockToVector(Mat& block){
-	vector<double> v;
-	
-	if (block.empty() || block.type() != CV_64F){
-		cout << "block is empty or type is not CV_64F"<<endl;
-		return v;
-	}
-	
-	
-	for (int i = 0;i < block.rows; i += 1){
-		for (int j = 0; j < block.cols; j +=1){
-			v.push_back(block.at<double>(i,j));
-
-		}
-	}
-	return v;
-}
-
-
-
-Mat blocksToImage(Matrix& blocks, int rows, int cols, int blockSize) {
+Mat blocksToImage(const vector<VectorXd>& blocks, int rows, int cols, int blockSize) {
     Mat image(rows, cols, CV_64F, Scalar(0));
     int index = 0;
     for (int i = 0; i < rows; i += blockSize) {
@@ -414,12 +382,12 @@ Mat blocksToImage(Matrix& blocks, int rows, int cols, int blockSize) {
             int actualWidth = min(blockSize, cols - j);
             
             
-            if (blocks.matrix[index].size() != blockSize*blockSize) {
+            if (blocks[index].size() != blockSize*blockSize) {
                 cerr << "Ошибка размера блока!" << endl;
                 exit(1);
             }
             
-            Mat fullBlock(blockSize, blockSize, CV_64F, const_cast<double*>(blocks.matrix[index].data()));
+            Mat fullBlock(blockSize, blockSize, CV_64F, const_cast<double*>(blocks[index].data()));
             Mat targetROI = image(Rect(j, i, actualWidth, actualHeight));
             fullBlock(Rect(0, 0, actualWidth, actualHeight)).copyTo(targetROI);
             index++;
@@ -428,20 +396,6 @@ Mat blocksToImage(Matrix& blocks, int rows, int cols, int blockSize) {
     return image;
 }
 
-Matrix Matrix::leftCols(int k) const { 
-    
-
-    Matrix result(size(), k); 
-
-    
-    for (int i = 0; i < size(); ++i) {
-        for (int j = 0; j < k; ++j) {
-            result.matrix[i][j] = (*this).matrix[i][j]; 
-        }
-    }
-
-    return result;
-}
 
 
 
