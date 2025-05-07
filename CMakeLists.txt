@@ -1,7 +1,10 @@
+cmake_minimum_required(VERSION 3.12)
 project(my-project)
 
-
-find_package(OpenCV REQUIRED)
+set(OpenCV_DIR "D:/opencv/opencv/build")
+set(OpenCV_DIR "D:/opencv/opencv/build/x64/mingw/lib")
+set(OpenCV_DIR "D:/opencv/opencv/build/x64/vc17/lib")
+find_package(OpenCV  REQUIRED)
 
 
 include_directories(
