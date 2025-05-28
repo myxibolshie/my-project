@@ -50,7 +50,7 @@ int main() {
 	   
     Mat image = imread("image.jpg", IMREAD_GRAYSCALE);
     if (image.empty()) {
-        cerr << "sdОшибка загрузки изображения!" << endl;
+        cerr << "sdпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!" << endl;
         return 1;
     }
     
@@ -74,14 +74,19 @@ int main() {
 
     
     VectorXd mean = X.colwise().mean();
-    X.rowwise() -= mean.transpose();
+    for (int i = 0; i < X.rows(); ++i) {
+    for (int j = 0; j < X.cols(); ++j) {
+        X(i, j) -= mean(j);
+    }
+}
 
 
    
     MatrixXd cov = (X.adjoint() * X) / (X.rows() - 1);
    
     
-    SelfAdjointEigenSolver<MatrixXd> solver(cov);
+  //  SelfAdjointEigenSolver<MatrixXd> solver(cov);
+    auto [eigenvalues, eigenvectors] = solver(cov);
     
     
     MatrixXd eigenvectors = solver.eigenvectors();
@@ -113,7 +118,7 @@ int main() {
     reconstructedImage.convertTo(reconstructedImage, CV_8U);
     imwrite("denoised_image.jpg", reconstructedImage);
 
-    cout << "Обработка завершена. Результат: denoised_image.jpg" << endl; 
+    cout << "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: denoised_image.jpg" << endl; 
 	}    
 
 	return 0;

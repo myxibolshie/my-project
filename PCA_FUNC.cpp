@@ -247,7 +247,7 @@ pair<vector<string>, MyMatrix>  writeMatrixFromCSV(const string& filename,const 
 void writeMatrixToCSV(const  vector<string>& names ,const MyMatrix& vec, const string& filename) {
 		ofstream file(filename);
 		if (!file.is_open()) {
-        		cerr << "Ошибка открытия файла!" << endl;
+        		cerr << "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ!" << endl;
         		return;
     		}
 
@@ -354,7 +354,7 @@ vector<VectorXd> imageToBlocks(const Mat& image, int blockSize) {
     vector<VectorXd> blocks;
     for (int i = 0; i < image.rows; i += blockSize) {
         for (int j = 0; j < image.cols; j += blockSize) {
-            // Рассчитываем актуальные размеры блока
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             int actualHeight = min(blockSize, image.rows - i);
             int actualWidth = min(blockSize, image.cols - j);
             
@@ -383,7 +383,7 @@ Mat blocksToImage(const vector<VectorXd>& blocks, int rows, int cols, int blockS
             
             
             if (blocks[index].size() != blockSize*blockSize) {
-                cerr << "Ошибка размера блока!" << endl;
+                cerr << "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ!" << endl;
                 exit(1);
             }
             
@@ -395,6 +395,73 @@ Mat blocksToImage(const vector<VectorXd>& blocks, int rows, int cols, int blockS
     }
     return image;
 }
+VectorXd mean(X.cols());
+for (int j = 0; j < X.cols(); ++j) {
+    mean(j) = 0;
+    for (int i = 0; i < X.rows(); ++i) {
+        mean(j) += X(i, j);
+    }
+    mean(j) /= X.rows();
+}
+
+MatrixXd eye(int n) {
+    Eigen::MatrixXd I = Eigen::MatrixXd::Zero(n, n);
+    for(int i = 0; i < n; ++i) I(i, i) = 1.0;
+    return I;
+}
+
+
+pair<Eigen::VectorXd, Eigen::MatrixXd> jacobi_eigensolver(const MatrixXd& A) {
+    const double epsilon = 1e-10;
+    const int max_iter = 1000;
+    int n = A.rows();
+    
+ 
+    Eigen::MatrixXd V = eye(n);  
+    Eigen::MatrixXd B = A;       
+
+    for(int iter = 0; iter < max_iter; ++iter) {
+        
+        double max_val = 0.0;
+        int p = 0, q = 0;
+        for(int i = 0; i < n; ++i) {
+            for(int j = i+1; j < n; ++j) {
+                if(fabs(B(i, j)) > max_val) {
+                    max_val = fabs(B(i, j));
+                    p = i;
+                    q = j;
+                }
+            }
+        }
+
+        
+        if(max_val < epsilon) break;
+
+        
+        double theta = 0.5 * atan2(2*B(p, q), B(q, q) - B(p, p));
+        double c = cos(theta);
+        double s = sin(theta);
+
+        
+        Eigen::MatrixXd J = eye(n);
+        J(p, p) = c; J(p, q) = -s;
+        J(q, p) = s; J(q, q) = c;
+
+        
+        B = J.transpose() * B * J;
+        V = V * J;
+    }
+
+    
+    Eigen::VectorXd eigenvalues(n);
+    for(int i = 0; i < n; ++i) {
+        eigenvalues(i) = B(i, i);
+    }
+
+    return {eigenvalues, V};
+}
+
+
 
 
 

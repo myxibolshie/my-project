@@ -51,6 +51,9 @@ struct MyMatrix {
 	void hello_world();
 	vector<VectorXd> imageToBlocks(const Mat& image, int BlockSize);
 	Mat blocksToImage( const vector<VectorXd>& blocks, int rows, int cols, int blockSize);
+	VectorXd mean(X.cols());
+	pair<VectorXd, MatrixXd> jacobi_eigensolver(const MatrixXd& A);
+	MatrixXd eye(int n);
 	
 	
 
